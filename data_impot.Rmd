@@ -1,0 +1,211 @@
+---
+title: "Data Import"
+author: "Yutong"
+date: "2026-09-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
+```
+
+# Data Import
+
+```{r}
+getwd() #get working directory
+```
+
+```{r}
+litters_df = read_csv(file = "./01_data/FAS_litters.csv")
+
+litters_df
+
+View(litters_df)
+
+```
+
+```{r}
+names(litters_df)
+```
+```{r}
+litters_df = janitor::clean_names(litters_df)
+```
+
+## Import FAS pups data
+
+```{r}
+pups_df = read_csv(file = "./01_data/FAS_pups.csv",
+                   skip = 3)
+pups_df = janitor::clean_names(pups_df)
+```
+
+## Looking at data
+```{r}
+str(litters_df)
+```
+
+```{r}
+head(litters_df)
+tail(litters_df)
+skimr::skim(litters_df) #使用skimr包里的skim函数 快速浏览
+```
+
+```{r}
+litters_df = 
+  read_csv(
+    file = "./01_data/FAS_litters.csv",
+    skip = 10,
+    col_names = FALSE
+  )
+
+head(litters_df)
+```
+
+## Arguements
+
+```{r}
+litters_df = 
+  read_csv(
+    file = "./01_data/FAS_litters.csv",
+    na = c(".", "NA", "") #告诉R哪些内容应该当作missing value
+  )
+```
+
+## Parsing columns解析列
+
+```{r}
+litters_df =
+  read_csv(
+    file = "./01_data/FAS_litters.csv",
+    na = c(".", "NA", ""),
+    col_types = cols(
+      Group = col_character(), #文字
+      `Litter Number` = col_character(), #··backticks用于包含空格的变量名
+      `GD0 weight` = col_double(), #double可以有小数的数值
+      `GD18 weight` = col_double(),
+      `GD of Birth` = col_integer(), #整数
+      `Pups born alive` = col_integer(),
+      `Pups dead @ birth` = col_integer(),
+      `Pups survive` = col_integer()
+    )
+  )  
+tail(litters_df)
+```
+
+```{r}
+litters_df =
+  read_csv(
+    file = "./01_data/FAS_litters.csv",
+    na = c(".", "NA", ""),
+    col_types = cols(
+      Group = col_factor()
+    )
+  )  
+
+head(litters_df)
+```
+
+```{r}
+
+pups_df = 
+  read_csv(
+    file = "./01_data/FAS_pups.csv",
+    skip = 3,
+    na = c(".", "NA"),
+    col_types = "fddddd"
+  )
+
+skimr::skim(pups_df)
+```
+
+```{r}
+str(pups_df)
+```
+
+## Import Excel files
+
+```{r}
+lotr_df = read_excel("./01_data/LotR_Words.xlsx")
+
+head(lotr_df)
+```
+
+```{r}
+
+fellowship_df = read_excel(
+  "./01_data/LotR_Words.xlsx",
+  sheet = "Sheet1",
+  range = "B3:D6"
+  )
+
+fellowship_df
+```
+
+## Import SAS data
+```{r}
+pulse_df = haven::read_sas("./01_data/public_pulse_data.sas7bdat") #package::function的组合
+
+head(pulse_df)
+```
+
+```{r}
+# import:文件-R
+litters_df = read_csv("./01_data/FAS_litters.csv")
+
+# export: R-文件
+write_csv(litters_df, "./01_data/litters_clean.csv")
+```
+
+```{r}
+write_csv(
+  litters_df,
+  "./01_data/litters_clean.csv"
+)
+```
+
+
+```{r}
+# save an R object 
+write_rds(
+  litters_df,
+  "./01_data/litters_df.rds"
+)
+
+# read the RDS file back into R
+litters_from_rds = read_rds(
+  "./01_data/litters_df.rds"
+)
+
+head(litters_from_rds)
+```
+
+
+## summary
+### import
+CSV: read_csv()
+
+Excel: read_excel()
+
+SAS: haven::read_sas()
+
+RDS: read_rds()
+
+### export
+
+CSV: write_csv()
+
+RDS: write_rds()
+
+### argument
+```{r, eval=FALSE}
+skip = 3                 # 跳过前3行
+na = c(".", "NA", "")    # 指定哪些内容代表missing
+col_names = FALSE        # 不把第一行作为column names
+col_types = ...          # 指定column types
+sheet = "Sheet1"         # Excel选择sheet
+range = "B3:D6"          # Excel选择读取范围
+```
+
